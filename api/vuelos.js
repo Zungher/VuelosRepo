@@ -1,3 +1,4 @@
+// api/salidas.js
 const fetch = require('node-fetch');
 
 module.exports = async (req, res) => {
@@ -7,29 +8,19 @@ module.exports = async (req, res) => {
     const response = await fetch(url);
     let html = await response.text();
 
-    // 1) Reemplaza cualquier referencia con dominio
-    html = html.replace(
-      /https?:\/\/salidas\.dgac\.gob\.gt\/vuelos\/pantallas\/img\//gi,
-      '/images/'
-    );
+    // Reemplaza rutas que sean 'src="images/...'
+    // por 'src="/images/...'
+    // De este modo, en el HTML final, <img src="images/icon_salidas.png">
+    // se convertirá en <img src="/images/icon_salidas.png">
+    html = html.replace(/src="images\//g, 'src="/images/');
 
-    // 2) Reemplaza con barra inicial (/vuelos/pantallas/img/...)
-    html = html.replace(
-      /\/vuelos\/pantallas\/img\//gi,
-      '/images/'
-    );
-
-    // 3) Reemplaza sin barra (vuelos/pantallas/img/...)
-    html = html.replace(
-      /vuelos\/pantallas\/img\//gi,
-      '/images/'
-    );
-
-    // Permitir acceso desde cualquier origen
+    // Configura cabeceras para permitir acceso y declarar tipo de contenido
     res.setHeader('Access-Control-Allow-Origin', '*');
-    // Indicar que estamos devolviendo HTML
     res.setHeader('Content-Type', 'text/html');
+
+    // Envía el HTML modificado
     res.status(200).send(html);
+
   } catch (error) {
     console.error(error);
     res.status(500).send('Error fetching data');
