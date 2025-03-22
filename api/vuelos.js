@@ -7,7 +7,7 @@ module.exports = async (req, res) => {
     const response = await fetch(url);
     let html = await response.text();
 
-    // 1) Reemplaza cualquier referencia con dominio (http://salidas.dgac.gob.gt/...)
+    // 1) Reemplaza cualquier referencia con dominio
     html = html.replace(
       /https?:\/\/salidas\.dgac\.gob\.gt\/vuelos\/pantallas\/img\//gi,
       '/images/'
@@ -25,11 +25,11 @@ module.exports = async (req, res) => {
       '/images/'
     );
 
-    // Configura los headers y envía el HTML modificado
+    // Permitir acceso desde cualquier origen
     res.setHeader('Access-Control-Allow-Origin', '*');
+    // Indicar que estamos devolviendo HTML
     res.setHeader('Content-Type', 'text/html');
     res.status(200).send(html);
-
   } catch (error) {
     console.error(error);
     res.status(500).send('Error fetching data');
